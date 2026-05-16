@@ -1,0 +1,34 @@
+---
+export interface Props {
+  title: string;
+  slug: string;
+  category: string;
+  rating: number;
+  verdict: string;
+  price: string;
+  image: string;
+}
+
+const { title, slug, category, rating, verdict, price, image } = Astro.props;
+const stars = Math.round(rating);
+const catNames: Record<string, string> = {
+  'furnace-igniters': 'Furnace Igniters', 'flame-sensors': 'Flame Sensors',
+  'pressure-switches': 'Pressure Switches', 'capacitors': 'Capacitors',
+  'fan-motors': 'Fan Motors', 'gas-valves': 'Gas Valves',
+  'control-boards': 'Control Boards', 'hvac-tools': 'HVAC Tools',
+  'electrical': 'Electrical Components',
+};
+---
+
+<a href={`/reviews/${slug}/`} class="block bg-white border border-gray-200 rounded-lg overflow-hidden hover:shadow-md transition-shadow">
+  <div class="h-40 bg-gradient-to-br from-blue-100 to-gray-100 flex items-center justify-center text-gray-400 text-sm">
+    {image}
+  </div>
+  <div class="p-4">
+    <span class="text-xs font-medium text-blue-600 uppercase tracking-wide">{catNames[category] || category}</span>
+    <h3 class="text-lg font-semibold text-gray-900 mt-1">{title}</h3>
+    <p class="text-sm text-gray-600 mt-2">{verdict}</p>
+    <span class="text-sm font-medium text-gray-800 mt-1 block">{price}</span>
+    <span class="inline-block mt-2 text-sm text-blue-600 hover:text-blue-800">Read Review →</span>
+  </div>
+</a>

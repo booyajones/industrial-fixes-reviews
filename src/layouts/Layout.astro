@@ -1,0 +1,44 @@
+---
+export interface Props {
+  title?: string;
+}
+
+const { title } = Astro.props;
+---
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <meta name="generator" content={Astro.generator} />
+    <title>{title ? `${title} | ErrorCodeFixes Reviews` : 'ErrorCodeFixes Reviews'}</title>
+    <link rel="stylesheet" href="/src/styles/global.css" />
+    <meta name="description" content="Honest, research-backed reviews of HVAC replacement parts and diagnostic tools." />
+  </head>
+  <body class="bg-white text-gray-900 antialiased">
+    <nav class="bg-gray-900 text-white">
+      <div class="max-w-6xl mx-auto px-4 py-3 flex items-center justify-between">
+        <a href="/" class="text-xl font-bold tracking-tight">ErrorCodeFixes <span class="text-blue-400">Reviews</span></a>
+        <div class="flex gap-6 text-sm">
+          <a href="/reviews/" class="hover:text-blue-300">All Reviews</a>
+          <a href="/categories/" class="hover:text-blue-300">Categories</a>
+          <a href="/best/" class="hover:text-blue-300">Buyer's Guides</a>
+          <a href="https://errorcodefixes.com" target="_blank" class="hover:text-blue-300">Repair Guides</a>
+        </div>
+      </div>
+    </nav>
+    <slot />
+    <footer class="bg-gray-50 border-t mt-16">
+      <div class="max-w-6xl mx-auto px-4 py-8 text-sm text-gray-500">
+        <div class="flex flex-wrap gap-6 mb-4">
+          <a href="https://errorcodefixes.com" class="hover:text-gray-700">errorcodefixes.com</a>
+          <a href="/reviews/" class="hover:text-gray-700">Product Reviews</a>
+          <a href="/categories/" class="hover:text-gray-700">Categories</a>
+        </div>
+        <p>Affiliate Disclosure: We earn a commission on purchases made through our links. Our reviews are based on specifications and research, not hands-on testing.</p>
+      </div>
+    </footer>
+  </body>
+</html>

@@ -1,0 +1,121 @@
+---
+import Layout from '../layouts/Layout.astro';
+import ReviewCard from '../components/ReviewCard.astro';
+import StarRating from '../components/StarRating.astro';
+import FTCNotice from '../components/FTCNotice.astro';
+---
+
+<Layout title="HVAC Repair Product Reviews - ErrorCodeFixes Reviews">
+  <main class="max-w-6xl mx-auto px-4 py-8">
+    <section class="mb-12 text-center">
+      <h1 class="text-4xl font-bold text-gray-900 mb-4">
+        HVAC Repair Product Reviews
+      </h1>
+      <p class="text-lg text-gray-600 max-w-2xl mx-auto">
+        Honest, research-backed reviews of HVAC replacement parts and diagnostic tools. 
+        Every product on this site is verified against manufacturer specifications so your repair works the first time.
+      </p>
+    </section>
+
+    <section class="mb-8">
+      <h2 class="text-2xl font-semibold text-gray-800 mb-6 pb-2 border-b border-gray-200">
+        Featured Reviews
+      </h2>
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <ReviewCard
+          title="Honeywell Hot Surface Igniter Q4100C"
+          slug="honeywell-hot-surface-igniter-q4100c"
+          category="furnace-igniters"
+          rating={4.5}
+          verdict="Reliable OEM replacement for most Lennox, Goodman, and Carrier furnaces"
+          price="$15 - $25"
+          image="/images/reviews/honeywell-igniter.jpg"
+        />
+        <ReviewCard
+          title="Universal Flame Sensor Rod"
+          slug="universal-flame-sensor-rod"
+          category="flame-sensors"
+          rating={4.0}
+          verdict="Affordable replacement that works with most furnace brands"
+          price="$8 - $15"
+          image="/images/reviews/flame-sensor.jpg"
+        />
+        <ReviewCard
+          title="Supco Run Capacitor 45+5 MFD"
+          slug="supco-run-capacitor-45-5-mfd"
+          category="capacitors"
+          rating={4.5}
+          verdict="Quality capacitor with consistent ratings — a solid HVAC replacement"
+          price="$12 - $20"
+          image="/images/reviews/supco-capacitor.jpg"
+        />
+        <ReviewCard
+          title="White-Rodgers Gas Valve 36E22"
+          slug="white-rodgers-gas-valve-36e22"
+          category="gas-valves"
+          rating={4.5}
+          verdict="Direct fit gas valve for most residential furnace brands"
+          price="$75 - $120"
+          image="/images/reviews/gas-valve.jpg"
+        />
+        <ReviewCard
+          title="Emerson Condenser Fan Motor K55HX"
+          slug="emerson-condenser-fan-motor-k55hx"
+          category="fan-motors"
+          rating={4.0}
+          verdict="Solid universal replacement motor for AC condenser units"
+          price="$55 - $90"
+          image="/images/reviews/fan-motor.jpg"
+        />
+        <ReviewCard
+          title="Fasco Inducer Motor Assembly"
+          slug="fasco-inducer-motor-assembly"
+          category="fan-motors"
+          rating={4.5}
+          verdict="Precision fit for most furnace inducer applications"
+          price="$90 - $150"
+          image="/images/reviews/inducer-motor.jpg"
+        />
+      </div>
+    </section>
+
+    <section class="my-12">
+      <h2 class="text-2xl font-semibold text-gray-800 mb-6 pb-2 border-b border-gray-200">
+        Buyer's Guides
+      </h2>
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        <a href="/best/furnace-igniters/" class="block p-6 bg-blue-50 rounded-lg hover:bg-blue-100 transition">
+          <h3 class="font-semibold text-blue-800">Best Furnace Igniters 2026</h3>
+          <p class="text-sm text-gray-600 mt-1">Top 5 hot surface igniters compared</p>
+        </a>
+        <a href="/best/flame-sensors/" class="block p-6 bg-green-50 rounded-lg hover:bg-green-100 transition">
+          <h3 class="font-semibold text-green-800">Best Flame Sensors for HVAC</h3>
+          <p class="text-sm text-gray-600 mt-1">Find the right flame sensor for your furnace</p>
+        </a>
+        <a href="/best/hvac-tools/" class="block p-6 bg-purple-50 rounded-lg hover:bg-purple-100 transition">
+          <h3 class="font-semibold text-purple-800">Essential HVAC Diagnostic Tools</h3>
+          <p class="text-sm text-gray-600 mt-1">Multimeters, gauges, and more for DIY diagnosis</p>
+        </a>
+      </div>
+    </section>
+
+    <section class="my-12">
+      <h2 class="text-2xl font-semibold text-gray-800 mb-6 pb-2 border-b border-gray-200">
+        Categories
+      </h2>
+      <div class="flex flex-wrap gap-3">
+        <a href="/categories/furnace-igniters/" class="px-4 py-2 bg-gray-100 rounded-full text-sm text-gray-700 hover:bg-gray-200">Furnace Igniters</a>
+        <a href="/categories/flame-sensors/" class="px-4 py-2 bg-gray-100 rounded-full text-sm text-gray-700 hover:bg-gray-200">Flame Sensors</a>
+        <a href="/categories/pressure-switches/" class="px-4 py-2 bg-gray-100 rounded-full text-sm text-gray-700 hover:bg-gray-200">Pressure Switches</a>
+        <a href="/categories/capacitors/" class="px-4 py-2 bg-gray-100 rounded-full text-sm text-gray-700 hover:bg-gray-200">Capacitors</a>
+        <a href="/categories/fan-motors/" class="px-4 py-2 bg-gray-100 rounded-full text-sm text-gray-700 hover:bg-gray-200">Fan Motors</a>
+        <a href="/categories/gas-valves/" class="px-4 py-2 bg-gray-100 rounded-full text-sm text-gray-700 hover:bg-gray-200">Gas Valves</a>
+        <a href="/categories/control-boards/" class="px-4 py-2 bg-gray-100 rounded-full text-sm text-gray-700 hover:bg-gray-200">Control Boards</a>
+        <a href="/categories/hvac-tools/" class="px-4 py-2 bg-gray-100 rounded-full text-sm text-gray-700 hover:bg-gray-200">HVAC Tools</a>
+        <a href="/categories/electrical/" class="px-4 py-2 bg-gray-100 rounded-full text-sm text-gray-700 hover:bg-gray-200">Electrical Components</a>
+      </div>
+    </section>
+
+    <FTCNotice />
+  </main>
+</Layout>

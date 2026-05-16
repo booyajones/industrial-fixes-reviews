@@ -1,5 +1,4 @@
 {
-  "extends": "astro/tsconfig/strict",
   "compilerOptions": {
     "baseUrl": ".",
     "paths": {
@@ -9,12 +8,12 @@
       "@styles/*": ["src/styles/*"],
       "@data/*": ["src/data/*"]
     },
-    "jsx": "react-jsx",
-    "jsxImportSource": "react",
-    "plugins": [
-      {
-        "name": "@tailwindcss/language-server"
-      }
-    ]
-  }
+    "jsx": "preserve",
+    "moduleResolution": "bundler",
+    "module": "ESNext",
+    "target": "ESNext",
+    "strict": true,
+    "skipLibCheck": true
+  },
+  "include": ["src/**/*", "astro.config.ts"]
 }
