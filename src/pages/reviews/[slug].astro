@@ -3,6 +3,7 @@ import Layout from '../../layouts/Layout.astro';
 import StarRating from '../../components/StarRating.astro';
 import FTCNotice from '../../components/FTCNotice.astro';
 import { reviews } from '../../data/reviews';
+import type { ReviewData } from '../../data/reviews';
 
 export function getStaticPaths() {
   return reviews.map((review) => ({
@@ -12,130 +13,256 @@ export function getStaticPaths() {
 }
 
 export interface Props {
-  review: typeof reviews[0];
+  review: ReviewData;
 }
 
 const { review } = Astro.props;
+
+const catNames: Record<string, string> = {
+  'furnace-igniters': 'Furnace Igniters',
+  'flame-sensors': 'Flame Sensors',
+  'pressure-switches': 'Pressure Switches',
+  'capacitors': 'Capacitors',
+  'fan-motors': 'Fan Motors',
+  'gas-valves': 'Gas Valves',
+  'control-boards': 'Control Boards',
+  'hvac-tools': 'HVAC Tools',
+  'electrical': 'Electrical',
+};
+
+const catLabel = catNames[review.category] ?? review.category;
+const ratingLabel = review.rating >= 4.5 ? 'Excellent' : review.rating >= 4.0 ? 'Very Good' : review.rating >= 3.5 ? 'Good' : 'Fair';
+
+const schema = JSON.stringify({
+  '@context': 'https://schema.org/',
+  '@type': 'Product',
+  name: review.title,
+  image: review.image,
+  description: review.verdict,
+  brand: { '@type': 'Brand', name: review.brand },
+  offers: {
+    '@type': 'Offer',
+    url: review.affiliateUrl,
+    priceCurrency: 'USD',
+    availability: 'https://schema.org/InStock',
+  },
+  review: {
+    '@type': 'Review',
+    reviewRating: {
+      '@type': 'Rating',
+      ratingValue: String(review.rating),
+      bestRating: '5',
+    },
+    author: { '@type': 'Organization', name: 'ErrorCodeFixes Reviews' },
+  },
+});
+
+// Related reviews in same category (excluding this one)
+const related = reviews.filter((r) => r.category === review.category && r.slug !== review.slug).slice(0, 3);
 ---
 
-<Layout title={review.title}>
-  <main class="max-w-4xl mx-auto px-4 py-8">
-    <nav class="text-sm text-gray-500 mb-6">
-      <a href="/" class="hover:text-blue-600">Home</a>
-      <span class="mx-2">/</span>
-      <a href="/reviews/" class="hover:text-blue-600">Reviews</a>
-      <span class="mx-2">/</span>
-      <a href={`/categories/${review.category}/`} class="hover:text-blue-600 capitalize">{review.category.replace(/-/g, ' ')}</a>
-      <span class="mx-2">/</span>
-      <span class="text-gray-800">{review.title}</span>
+<Layout title={review.title} description={review.verdict} schema={schema}>
+  <main class="max-w-6xl mx-auto px-4 sm:px-6 py-10">
+
+    <!-- Breadcrumb -->
+    <nav class="text-sm text-gray-400 mb-8 flex flex-wrap items-center gap-1" aria-label="Breadcrumb">
+      <a href="/" class="hover:text-blue-600 transition-colors">Home</a>
+      <span>/</span>
+      <a href="/reviews/" class="hover:text-blue-600 transition-colors">Reviews</a>
+      <span>/</span>
+      <a href={`/categories/#${review.category}`} class="hover:text-blue-600 transition-colors">{catLabel}</a>
+      <span>/</span>
+      <span class="text-gray-700 font-medium">{review.title}</span>
     </nav>
 
-    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-10">
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-12">
+
+      <!-- Main content -->
       <div class="lg:col-span-2">
-        <div class="flex items-center gap-2 mb-2">
-          <span class="text-sm font-medium text-blue-600 uppercase tracking-wide">{review.brand}</span>
-        </div>
-        <h1 class="text-3xl font-bold text-gray-900 mb-3">{review.title}</h1>
-        <div class="flex items-center gap-3 mb-4">
+        <div class="text-xs font-semibold text-blue-600 uppercase tracking-wider mb-2">{review.brand} &middot; {catLabel}</div>
+        <h1 class="text-3xl sm:text-4xl font-bold text-gray-900 leading-tight mb-4">{review.title}</h1>
+
+        <div class="flex flex-wrap items-center gap-3 mb-5">
           <StarRating rating={review.rating} size="lg" />
-          <span class="text-lg font-medium text-gray-700">{review.rating}/5</span>
+          <span class="text-base font-semibold text-gray-700">{review.rating} / 5</span>
+          <span class="text-sm text-gray-400">&mdash; {ratingLabel}</span>
         </div>
-        <p class="text-lg text-gray-700 mb-4 leading-relaxed">{review.verdict}</p>
-        <p class="text-2xl font-bold text-gray-900 mb-6">{review.priceRange}</p>
-        <a href={review.affiliateUrl} target="_blank" rel="nofollow sponsored" class="inline-block bg-blue-600 hover:bg-blue-700 text-white font-semibold px-8 py-3 rounded-lg transition-colors mb-8">
-          Check Price on Amazon →
-        </a>
+
+        <p class="text-lg text-gray-700 leading-relaxed mb-4 border-l-4 border-blue-500 pl-4 italic">
+          {review.verdict}
+        </p>
+
+        <div class="flex flex-wrap items-center gap-4 mt-6">
+          <span class="text-2xl font-bold text-gray-900">{review.priceRange}</span>
+          <a
+            href={review.affiliateUrl}
+            target="_blank"
+            rel="nofollow noopener sponsored"
+            class="inline-flex items-center gap-2 bg-blue-600 hover:bg-blue-500 text-white font-semibold px-6 py-3 rounded-lg transition-colors shadow-sm"
+          >
+            Check Price on Amazon
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+            </svg>
+          </a>
+        </div>
       </div>
-      <div class="bg-gray-50 rounded-lg p-6 border border-gray-200">
-        <h2 class="font-semibold text-gray-800 mb-3">Quick Specs</h2>
-        <dl class="space-y-3 text-sm">
-          <div><dt class="text-gray-500">Brand</dt><dd class="font-medium">{review.brand}</dd></div>
-          <div><dt class="text-gray-500">Category</dt><dd class="font-medium capitalize">{review.category.replace(/-/g, ' ')}</dd></div>
-          <div><dt class="text-gray-500">Price Range</dt><dd class="font-medium">{review.priceRange}</dd></div>
-          <div><dt class="text-gray-500">ASIN</dt><dd class="font-mono text-xs">{review.asin}</dd></div>
-        </dl>
-      </div>
+
+      <!-- Sidebar -->
+      <aside>
+        <div class="bg-gray-50 border border-gray-200 rounded-xl p-5 sticky top-20">
+          <h2 class="text-sm font-semibold text-gray-700 uppercase tracking-wider mb-4">Quick Specs</h2>
+          <dl class="space-y-3 text-sm mb-5">
+            <div class="flex justify-between gap-2">
+              <dt class="text-gray-500">Brand</dt>
+              <dd class="font-medium text-gray-900 text-right">{review.brand}</dd>
+            </div>
+            <div class="flex justify-between gap-2">
+              <dt class="text-gray-500">Category</dt>
+              <dd class="font-medium text-gray-900 text-right">{catLabel}</dd>
+            </div>
+            <div class="flex justify-between gap-2">
+              <dt class="text-gray-500">Price Range</dt>
+              <dd class="font-semibold text-gray-900 text-right">{review.priceRange}</dd>
+            </div>
+            <div class="flex justify-between gap-2">
+              <dt class="text-gray-500">Rating</dt>
+              <dd class="font-medium text-gray-900 text-right">{review.rating} / 5 &mdash; {ratingLabel}</dd>
+            </div>
+            <div class="flex justify-between gap-2">
+              <dt class="text-gray-500">ASIN</dt>
+              <dd class="font-mono text-xs text-gray-600 text-right">{review.asin}</dd>
+            </div>
+          </dl>
+          <a
+            href={review.affiliateUrl}
+            target="_blank"
+            rel="nofollow noopener sponsored"
+            class="block w-full text-center bg-blue-600 hover:bg-blue-500 text-white font-semibold py-3 rounded-lg transition-colors text-sm"
+          >
+            View on Amazon &rarr;
+          </a>
+          {review.repairGuideUrl && (
+            <a
+              href={review.repairGuideUrl}
+              target="_blank"
+              rel="noopener"
+              class="block w-full text-center mt-2 text-sm font-medium text-blue-600 hover:text-blue-800 py-2 transition-colors"
+            >
+              Related Repair Guide &rarr;
+            </a>
+          )}
+        </div>
+      </aside>
     </div>
 
-    <div class="prose max-w-none mb-10">
-      <h2>Overview</h2>
-      <p>{review.description}</p>
-    </div>
+    <!-- Overview -->
+    <section class="mb-10 border border-gray-200 rounded-xl p-6 bg-white">
+      <h2 class="text-lg font-bold text-gray-900 mb-3">Overview</h2>
+      <p class="text-gray-700 leading-relaxed text-[15px]">{review.description}</p>
+    </section>
 
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-10">
-      <div class="bg-green-50 border border-green-200 rounded-lg p-6">
-        <h2 class="text-lg font-semibold text-green-800 mb-3">Pros</h2>
-        <ul class="space-y-2">
-          {review.pros.map(pro => (
-            <li class="flex items-start gap-2 text-green-900">
-              <span class="text-green-600 mt-0.5">✓</span>
+    <!-- Pros & Cons -->
+    <section class="grid grid-cols-1 md:grid-cols-2 gap-5 mb-10">
+      <div class="bg-green-50 border border-green-200 rounded-xl p-6">
+        <h2 class="text-base font-bold text-green-800 mb-4 flex items-center gap-2">
+          <span class="w-5 h-5 bg-green-600 text-white rounded-full flex items-center justify-center text-xs font-bold shrink-0">+</span>
+          Pros
+        </h2>
+        <ul class="space-y-3">
+          {review.pros.map((pro) => (
+            <li class="flex items-start gap-2.5 text-sm text-green-900 leading-relaxed">
+              <svg class="w-4 h-4 text-green-600 mt-0.5 shrink-0" fill="currentColor" viewBox="0 0 20 20" aria-hidden="true">
+                <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" />
+              </svg>
               <span>{pro}</span>
             </li>
           ))}
         </ul>
       </div>
-      <div class="bg-red-50 border border-red-200 rounded-lg p-6">
-        <h2 class="text-lg font-semibold text-red-800 mb-3">Cons</h2>
-        <ul class="space-y-2">
-          {review.cons.map(con => (
-            <li class="flex items-start gap-2 text-red-900">
-              <span class="text-red-600 mt-0.5">✗</span>
+
+      <div class="bg-red-50 border border-red-200 rounded-xl p-6">
+        <h2 class="text-base font-bold text-red-800 mb-4 flex items-center gap-2">
+          <span class="w-5 h-5 bg-red-500 text-white rounded-full flex items-center justify-center text-xs font-bold shrink-0">&minus;</span>
+          Cons
+        </h2>
+        <ul class="space-y-3">
+          {review.cons.map((con) => (
+            <li class="flex items-start gap-2.5 text-sm text-red-900 leading-relaxed">
+              <svg class="w-4 h-4 text-red-500 mt-0.5 shrink-0" fill="currentColor" viewBox="0 0 20 20" aria-hidden="true">
+                <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd" />
+              </svg>
               <span>{con}</span>
             </li>
           ))}
         </ul>
       </div>
-    </div>
+    </section>
 
-    <div class="mb-10">
-      <h2 class="text-xl font-semibold text-gray-800 mb-3">Who It's For</h2>
-      <p class="text-gray-700 leading-relaxed">{review.whoItsFor}</p>
-    </div>
-
-    <div class="mb-10 p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
-      <h2 class="text-lg font-semibold text-yellow-800 mb-2">Who Should Skip This</h2>
-      <p class="text-yellow-900 leading-relaxed">{review.whoShouldSkip}</p>
-    </div>
-
-    <div class="mb-10">
-      <h2 class="text-xl font-semibold text-gray-800 mb-3">Compatibility</h2>
-      <p class="text-gray-700 leading-relaxed">{review.compatibility}</p>
-    </div>
-
-    {review.repairGuideUrl && (
-      <div class="mb-10 p-4 bg-blue-50 border border-blue-200 rounded-lg">
-        <h2 class="text-lg font-semibold text-blue-800 mb-2">Related Repair Guide</h2>
-        <p class="text-blue-900 mb-2">This part is referenced in our main repair guide:</p>
-        <a href={review.repairGuideUrl} target="_blank" class="text-blue-600 hover:underline font-medium">View the full diagnostic guide on errorcodefixes.com →</a>
+    <!-- Who It's For / Skip -->
+    <section class="grid grid-cols-1 md:grid-cols-2 gap-5 mb-10">
+      <div class="border border-gray-200 rounded-xl p-6 bg-white">
+        <h2 class="text-base font-bold text-gray-900 mb-3">Who It's For</h2>
+        <p class="text-sm text-gray-700 leading-relaxed">{review.whoItsFor}</p>
       </div>
-    )}
+      <div class="border border-yellow-200 rounded-xl p-6 bg-yellow-50">
+        <h2 class="text-base font-bold text-yellow-800 mb-3">Who Should Skip This</h2>
+        <p class="text-sm text-yellow-900 leading-relaxed">{review.whoShouldSkip}</p>
+      </div>
+    </section>
 
-    <div class="border-t border-gray-200 pt-8 mb-10">
-      <h2 class="text-xl font-semibold text-gray-800 mb-3">Bottom Line</h2>
-      <p class="text-gray-700 leading-relaxed text-lg">{review.bottomLine}</p>
-    </div>
+    <!-- Compatibility -->
+    <section class="mb-10 border border-gray-200 rounded-xl p-6 bg-white">
+      <h2 class="text-lg font-bold text-gray-900 mb-3">Compatibility</h2>
+      <p class="text-gray-700 leading-relaxed text-sm">{review.compatibility}</p>
+    </section>
 
-    <div class="text-center my-8">
-      <a href={review.affiliateUrl} target="_blank" rel="nofollow sponsored" class="inline-block bg-blue-600 hover:bg-blue-700 text-white font-semibold px-10 py-4 rounded-lg text-lg transition-colors">
+    <!-- Bottom Line -->
+    <section class="mb-10 border-t-4 border-blue-600 rounded-xl bg-white border border-gray-200 p-6">
+      <h2 class="text-lg font-bold text-gray-900 mb-3">Bottom Line</h2>
+      <p class="text-gray-800 leading-relaxed text-[15px]">{review.bottomLine}</p>
+    </section>
+
+    <!-- CTA -->
+    <div class="text-center py-8 mb-6">
+      <p class="text-sm text-gray-500 mb-4">Pricing and availability may change. Check current price before purchasing.</p>
+      <a
+        href={review.affiliateUrl}
+        target="_blank"
+        rel="nofollow noopener sponsored"
+        class="inline-flex items-center gap-2 bg-blue-600 hover:bg-blue-500 text-white font-bold px-10 py-4 rounded-xl text-lg transition-colors shadow-md"
+      >
         Check Latest Price on Amazon
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+        </svg>
       </a>
     </div>
+
+    <!-- Related reviews -->
+    {related.length > 0 && (
+      <section class="mb-10">
+        <h2 class="text-lg font-bold text-gray-900 mb-4">More {catLabel} Reviews</h2>
+        <div class="divide-y divide-gray-100 border border-gray-200 rounded-xl overflow-hidden">
+          {related.map((r) => (
+            <a
+              href={`/reviews/${r.slug}/`}
+              class="group flex items-center justify-between gap-4 px-5 py-4 bg-white hover:bg-blue-50 transition-colors"
+            >
+              <div class="min-w-0">
+                <div class="font-semibold text-gray-900 group-hover:text-blue-700 transition-colors">{r.title}</div>
+                <div class="text-sm text-gray-500 truncate">{r.verdict}</div>
+              </div>
+              <div class="flex items-center gap-3 shrink-0">
+                <span class="text-sm font-medium text-gray-600">{r.priceRange}</span>
+                <span class="text-sm font-medium text-blue-600 group-hover:text-blue-800">Review &rarr;</span>
+              </div>
+            </a>
+          ))}
+        </div>
+      </section>
+    )}
 
     <FTCNotice />
   </main>
 </Layout>
-
-<script type="application/ld+json" set:html={JSON.stringify({
-  "@context": "https://schema.org/",
-  "@type": "Product",
-  "name": review.title,
-  "image": review.image,
-  "description": review.verdict,
-  "brand": { "@type": "Brand", "name": review.brand },
-  "offers": { "@type": "Offer", "url": review.affiliateUrl, "priceCurrency": "USD", "availability": "https://schema.org/InStock" },
-  "review": {
-    "@type": "Review",
-    "reviewRating": { "@type": "Rating", "ratingValue": review.rating, "bestRating": "5" },
-    "author": { "@type": "Organization", "name": "ErrorCodeFixes Reviews" }
-  }
-})} />

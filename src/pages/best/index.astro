@@ -1,24 +1,100 @@
 ---
 import Layout from '../../layouts/Layout.astro';
+import { reviews } from '../../data/reviews';
+
+const guides = [
+  {
+    category: 'furnace-igniters',
+    title: 'Best Furnace Igniters 2026',
+    subtitle: 'Hot Surface Igniters',
+    description: 'Hot surface igniters are the most common furnace repair. We ranked the top replacements by compatibility, durability, and value to help you get it right the first time.',
+    topPicks: reviews.filter(r => r.category === 'furnace-igniters'),
+  },
+  {
+    category: 'flame-sensors',
+    title: 'Best Flame Sensors for HVAC',
+    subtitle: 'Flame Sensing Rods & Thermocouples',
+    description: 'A failed flame sensor is one of the cheapest furnace repairs you can do — if you buy the right part. We cover both universal rods and brand-specific sensors.',
+    topPicks: reviews.filter(r => r.category === 'flame-sensors'),
+  },
+  {
+    category: 'capacitors',
+    title: 'Best HVAC Run Capacitors',
+    subtitle: 'Dual-Run & Start Capacitors',
+    description: 'Capacitor failure is the most common summer AC repair. A $15 part — if you know the MFD rating your unit requires. Here\'s how to pick the right one.',
+    topPicks: reviews.filter(r => r.category === 'capacitors'),
+  },
+  {
+    category: 'fan-motors',
+    title: 'Best HVAC Fan & Inducer Motors',
+    subtitle: 'Condenser & Inducer Motors',
+    description: 'Motor replacements for condenser units and furnace inducers. We compare universal vs. OEM-specific options and explain when each approach makes sense.',
+    topPicks: reviews.filter(r => r.category === 'fan-motors'),
+  },
+];
 ---
 
-<Layout title="Buyer's Guides">
-  <main class="max-w-6xl mx-auto px-4 py-8">
-    <h1 class="text-3xl font-bold text-gray-900 mb-2">Buyer's Guides</h1>
-    <p class="text-gray-600 mb-8">Research-backed buying guides for HVAC replacement parts.</p>
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-      <a href="/best/furnace-igniters/" class="block p-6 bg-white border rounded-lg hover:shadow-md">
-        <h2 class="text-xl font-semibold text-gray-900">Best Furnace Igniters 2026</h2>
-        <p class="text-gray-600 mt-2">Compare the top 5 hot surface igniters for your furnace replacement.</p>
-      </a>
-      <a href="/best/flame-sensors/" class="block p-6 bg-white border rounded-lg hover:shadow-md">
-        <h2 class="text-xl font-semibold text-gray-900">Best Flame Sensors for HVAC</h2>
-        <p class="text-gray-600 mt-2">Find the right flame sensor for your furnace make and model.</p>
-      </a>
-      <a href="/best/hvac-tools/" class="block p-6 bg-white border rounded-lg hover:shadow-md">
-        <h2 class="text-xl font-semibold text-gray-900">Essential HVAC Diagnostic Tools</h2>
-        <p class="text-gray-600 mt-2">Multimeters, manometers, and tools every DIYer should own.</p>
-      </a>
+<Layout
+  title="Buyer's Guides"
+  description="Research-backed buying guides for HVAC replacement parts. Compare top picks for furnace igniters, flame sensors, capacitors, motors, and more."
+>
+  <main class="max-w-6xl mx-auto px-4 sm:px-6 py-10">
+
+    <!-- Breadcrumb -->
+    <nav class="text-sm text-gray-400 mb-6" aria-label="Breadcrumb">
+      <a href="/" class="hover:text-blue-600 transition-colors">Home</a>
+      <span class="mx-2">/</span>
+      <span class="text-gray-700 font-medium">Buyer's Guides</span>
+    </nav>
+
+    <div class="mb-10">
+      <h1 class="text-3xl font-bold text-gray-900 mb-2">Buyer's Guides</h1>
+      <p class="text-gray-500">
+        Research-backed guides to help you pick the right HVAC replacement part and avoid the wrong one.
+      </p>
     </div>
+
+    <div class="space-y-8">
+      {guides.map(({ category, title, subtitle, description, topPicks }) => (
+        <article class="bg-white border border-gray-200 rounded-xl overflow-hidden shadow-sm">
+          <div class="px-6 py-5 border-b border-gray-100">
+            <div class="text-xs font-semibold text-blue-600 uppercase tracking-wider mb-1">{subtitle}</div>
+            <h2 class="text-xl font-bold text-gray-900 mb-2">{title}</h2>
+            <p class="text-gray-500 text-sm leading-relaxed">{description}</p>
+          </div>
+
+          <div class="divide-y divide-gray-100">
+            {topPicks.map((r, i) => (
+              <a
+                href={`/reviews/${r.slug}/`}
+                class="group flex items-center gap-4 px-6 py-4 hover:bg-blue-50 transition-colors"
+              >
+                <div class="text-lg font-bold text-gray-200 w-6 shrink-0 text-center">{i + 1}</div>
+                <div class="min-w-0 flex-1">
+                  <div class="font-semibold text-gray-900 group-hover:text-blue-700 transition-colors">
+                    {r.title}
+                  </div>
+                  <div class="text-sm text-gray-500 truncate">{r.verdict}</div>
+                </div>
+                <div class="hidden sm:block text-sm font-medium text-gray-600 shrink-0">{r.priceRange}</div>
+                <span class="text-blue-600 text-sm font-medium group-hover:text-blue-800 shrink-0">
+                  Read &rarr;
+                </span>
+              </a>
+            ))}
+          </div>
+
+          <div class="px-6 py-4 bg-gray-50 border-t border-gray-100">
+            <a
+              href={`/reviews/#${category}`}
+              class="text-sm font-medium text-blue-600 hover:text-blue-800 transition-colors"
+            >
+              See all {subtitle.toLowerCase()} reviews &rarr;
+            </a>
+          </div>
+        </article>
+      ))}
+    </div>
+
   </main>
 </Layout>

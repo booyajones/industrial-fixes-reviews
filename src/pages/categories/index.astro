@@ -1,26 +1,87 @@
 ---
 import Layout from '../../layouts/Layout.astro';
+import StarRating from '../../components/StarRating.astro';
 import { reviews } from '../../data/reviews';
+
+const catNames: Record<string, string> = {
+  'furnace-igniters': 'Furnace Igniters',
+  'flame-sensors': 'Flame Sensors',
+  'pressure-switches': 'Pressure Switches',
+  'capacitors': 'Capacitors',
+  'fan-motors': 'Fan Motors',
+  'gas-valves': 'Gas Valves',
+  'control-boards': 'Control Boards',
+  'hvac-tools': 'HVAC Tools',
+  'electrical': 'Electrical',
+};
+
+const categories = Array.from(new Set(reviews.map((r) => r.category)));
 ---
 
-<Layout title="Categories">
-  <main class="max-w-6xl mx-auto px-4 py-8">
-    <h1 class="text-3xl font-bold text-gray-900 mb-2">Categories</h1>
-    <p class="text-gray-600 mb-8">Browse HVAC product reviews by category.</p>
-    
-    <div class="space-y-10">
-      {Array.from(new Set(reviews.map(r => r.category))).map(cat => {
-        const catReviews = reviews.filter(r => r.category === cat);
-        const catName = cat.replace(/-/g, ' ').replace(/\b\w/g, (s: string) => s.toUpperCase());
+<Layout
+  title="Categories"
+  description="Browse HVAC product reviews by category — furnace igniters, flame sensors, capacitors, motors, and more."
+>
+  <main class="max-w-6xl mx-auto px-4 sm:px-6 py-10">
+
+    <!-- Breadcrumb -->
+    <nav class="text-sm text-gray-400 mb-6" aria-label="Breadcrumb">
+      <a href="/" class="hover:text-blue-600 transition-colors">Home</a>
+      <span class="mx-2">/</span>
+      <span class="text-gray-700 font-medium">Categories</span>
+    </nav>
+
+    <div class="mb-10">
+      <h1 class="text-3xl font-bold text-gray-900 mb-2">Categories</h1>
+      <p class="text-gray-500">Browse HVAC product reviews by part type.</p>
+    </div>
+
+    <!-- Category index -->
+    <div class="flex flex-wrap gap-2 mb-12 pb-8 border-b border-gray-200">
+      {categories.map((cat) => (
+        <a
+          href={`#${cat}`}
+          class="px-3 py-1.5 bg-white border border-gray-200 rounded-full text-sm font-medium text-gray-600 hover:border-blue-300 hover:text-blue-700 hover:bg-blue-50 transition-colors"
+        >
+          {catNames[cat] ?? cat}
+          <span class="ml-1.5 text-xs text-gray-400">({reviews.filter(r => r.category === cat).length})</span>
+        </a>
+      ))}
+    </div>
+
+    <!-- Category sections -->
+    <div class="space-y-14">
+      {categories.map((cat) => {
+        const catReviews = reviews.filter((r) => r.category === cat);
+        const label = catNames[cat] ?? cat;
         return (
-          <section>
-            <h2 class="text-2xl font-semibold text-gray-800 mb-4 capitalize">{catName}</h2>
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-              {catReviews.map(r => (
-                <a href={`/reviews/${r.slug}/`} class="p-4 border rounded-lg hover:bg-gray-50 transition">
-                  <h3 class="font-semibold text-gray-900">{r.title}</h3>
-                  <p class="text-sm text-gray-600 mt-1">{r.verdict}</p>
-                  <span class="text-sm font-medium text-blue-600 mt-2 inline-block">Read Review →</span>
+          <section id={cat}>
+            <div class="flex items-baseline justify-between mb-5">
+              <h2 class="text-xl font-bold text-gray-900">{label}</h2>
+              <span class="text-sm text-gray-400">{catReviews.length} {catReviews.length === 1 ? 'review' : 'reviews'}</span>
+            </div>
+            <div class="divide-y divide-gray-100 border border-gray-200 rounded-xl overflow-hidden">
+              {catReviews.map((r) => (
+                <a
+                  href={`/reviews/${r.slug}/`}
+                  class="group flex items-center justify-between gap-4 px-5 py-4 bg-white hover:bg-blue-50 transition-colors"
+                >
+                  <div class="min-w-0">
+                    <div class="font-semibold text-gray-900 group-hover:text-blue-700 transition-colors truncate">
+                      {r.title}
+                    </div>
+                    <div class="text-sm text-gray-500 mt-0.5 truncate">{r.verdict}</div>
+                  </div>
+                  <div class="flex items-center gap-4 shrink-0">
+                    <div class="hidden sm:flex items-center gap-1.5">
+                      <StarRating rating={r.rating} size="sm" />
+                      <span class="text-xs text-gray-500">{r.rating}</span>
+                    </div>
+                    <span class="text-sm font-medium text-gray-700 whitespace-nowrap">{r.priceRange}</span>
+                    <span class="text-blue-600 text-sm font-medium group-hover:text-blue-800 transition-colors whitespace-nowrap">
+                      Review &rarr;
+                    </span>
+                  </div>
                 </a>
               ))}
             </div>
@@ -28,5 +89,6 @@ import { reviews } from '../../data/reviews';
         );
       })}
     </div>
+
   </main>
 </Layout>
